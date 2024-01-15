@@ -1,3 +1,4 @@
+// JCL_DEBUG_EXPERT_INSERTJDBG OFF
 program DspecCreator;
 
 {$R *.dres}
@@ -113,7 +114,23 @@ uses
   DPM.Creator.TemplateTreeNode in 'DPM.Creator.TemplateTreeNode.pas',
   DPM.Creator.BuildForm in 'DPM.Creator.BuildForm.pas' {BuildForm},
   DPM.IDE.Options in '..\IDE\Options\DPM.IDE.Options.pas',
-  DPM.IDE.AboutForm in '..\IDE\DPM.IDE.AboutForm.pas' {DPMAboutForm};
+  DPM.IDE.AboutForm in '..\IDE\DPM.IDE.AboutForm.pas' {DPMAboutForm},
+  GDIPKerning in '..\SVG\GDIPKerning.pas',
+  GDIPOBJ2 in '..\SVG\GDIPOBJ2.pas',
+  GDIPPathText in '..\SVG\GDIPPathText.pas',
+  PasSVGFactory in '..\SVG\PasSVGFactory.pas',
+  SVG in '..\SVG\SVG.pas',
+  SVGBase64 in '..\SVG\SVGBase64.pas',
+  SVGColor in '..\SVG\SVGColor.pas',
+  SVGCommon in '..\SVG\SVGCommon.pas',
+  SVGGraphic in '..\SVG\SVGGraphic.pas',
+  SVGInterfaces in '..\SVG\SVGInterfaces.pas',
+  SVGPaint in '..\SVG\SVGPaint.pas',
+  SVGParse in '..\SVG\SVGParse.pas',
+  SVGPath in '..\SVG\SVGPath.pas',
+  SVGStyle in '..\SVG\SVGStyle.pas',
+  SVGTypes in '..\SVG\SVGTypes.pas',
+  XmlLite in '..\SVG\XmlLite.pas';
 
 {$R *.res}
 
