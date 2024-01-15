@@ -1998,20 +1998,11 @@ begin
 end;
 
 procedure TDSpecCreatorForm.ImgIconClick(Sender: TObject);
-var
-  relativePath : string;
 begin
-  if Length(FSavefilename) = 0 then
-  begin
-    ShowMessage('Save dspec file before adding the icon');
-    Exit;
-  end;
-
   if OpenPictureDialog1.Execute then
   begin
     ImgIcon.Picture.LoadFromFile(OpenPictureDialog1.FileName);
-    relativePath := ExtractRelativePath(FOpenFile.WorkingDir, OpenPictureDialog1.FileName);
-    FOpenFile.spec.MetaData.Icon := relativePath;
+    FOpenFile.spec.MetaData.Icon := OpenPictureDialog1.FileName;
   end;
 end;
 

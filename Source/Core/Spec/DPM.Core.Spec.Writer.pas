@@ -24,6 +24,7 @@ implementation
 
 uses
   System.IOUtils,
+  System.SysUtils,
   JSONDataObjects,
   DPM.Core.Project.Interfaces;
 
@@ -42,8 +43,17 @@ begin
 end;
 
 procedure TPackageSpecWriter.SaveToFile(filename: string);
+var
+  relativePath: String;
 begin
   JsonSerializationConfig.IndentChar := ' ';
+
+  if not TPath.IsRelativePath(Fspec.MetaData.Icon) then
+  begin
+    relativePath := ExtractRelativePath(ExtractFilePath(filename), filename);
+    Fspec.MetaData.Icon := relativePath;
+  end;
+
   TFile.WriteAllText(Filename, Fspec.ToJson);
 end;
 
