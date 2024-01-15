@@ -40,6 +40,12 @@ uses
   ;
 
 type
+  TTargetPlatformListItem = class(TListItem)
+  public
+    targetPlatform: ISpecTargetPlatform;
+    platform : TDPMPlatform;
+  end;
+
   TDSpecCreatorForm = class(TForm)
     PageControl: TPageControl;
     tsInfo: TTabSheet;
@@ -195,10 +201,15 @@ type
     Label9: TLabel;
     Label10: TLabel;
     Label11: TLabel;
+    tsDryRun: TTabSheet;
+    tvDryRunFolders: TTreeView;
+    lvDryRunFiles: TListView;
+    lvTemplatePlatformList: TListView;
     Help1: TMenuItem;
     CreatingPackages1: TMenuItem;
     N2: TMenuItem;
     About1: TMenuItem;
+    PlatformImageList: TImageList;
     procedure FormDestroy(Sender: TObject);
     procedure btnAddExcludeClick(Sender: TObject);
     procedure btnAddTemplateClick(Sender: TObject);
@@ -277,8 +288,12 @@ type
     procedure actAddSourceItemExecute(Sender: TObject);
     procedure actDeleteSourceItemExecute(Sender: TObject);
     procedure ImgIconClick(Sender: TObject);
+    procedure lvTemplatePlatformListCreateItemClass(Sender: TCustomListView; var ItemClass: TListItemClass);
+    procedure lvTemplatePlatformListSelectItem(Sender: TObject; Item: TListItem; Selected: Boolean);
+    procedure tsDryRunShow(Sender: TObject);
     procedure CreatingPackages1Click(Sender: TObject);
     procedure About1Click(Sender: TObject);
+    procedure tsDryRunResize(Sender: TObject);
   private
     { Private declarations }
     FtmpFilename : string;
@@ -289,6 +304,7 @@ type
     FLogger: ILogger;
     FInVariableUpdate: Boolean;
     FSPDXList : TStringList;
+    function PlatformToIconIndex(platform: TDPMPlatform): Integer;
   protected
 
     procedure DeleteSelectedEntry;
@@ -2006,6 +2022,21 @@ begin
   end;
 end;
 
+procedure TDSpecCreatorForm.lvTemplatePlatformListCreateItemClass(Sender: TCustomListView; var ItemClass: TListItemClass);
+begin
+  ItemClass := TTargetPlatformListItem;
+end;
+
+procedure TDSpecCreatorForm.lvTemplatePlatformListSelectItem(Sender: TObject;
+    Item: TListItem; Selected: Boolean);
+var
+  targetPlatformItem : TTargetPlatformListItem;
+  targetPlatform : ISpecTargetPlatform;
+begin
+  targetPlatformItem := Item as TTargetPlatformListItem;
+  targetPlatform := targetPlatformItem.targetPlatform.CloneForPlatform(targetPlatformItem.platform);
+end;
+
 procedure TDSpecCreatorForm.miNewClick(Sender: TObject);
 begin
   FreeAndNil(FOpenFile);
@@ -2068,6 +2099,77 @@ end;
 procedure TDSpecCreatorForm.mmoDescriptionChange(Sender: TObject);
 begin
   FOpenFile.spec.metadata.description := mmoDescription.Text;
+end;
+
+function TDSpecCreatorForm.PlatformToIconIndex(platform: TDPMPlatform): Integer;
+begin
+  case platform of
+    TDPMPlatform.UnknownPlatform: Result := 0;
+    TDPMPlatform.Win32: Result := 2;
+    TDPMPlatform.Win64: Result := 3;
+    TDPMPlatform.WinArm32: Result := 2;
+    TDPMPlatform.WinArm64: Result := 3;
+    TDPMPlatform.OSX32: Result := 1;
+    TDPMPlatform.OSX64: Result := 1;
+    TDPMPlatform.OSXARM64: Result := 1;
+    TDPMPlatform.AndroidArm32: Result := 5;
+    TDPMPlatform.AndroidArm64: Result := 5;
+    TDPMPlatform.AndroidIntel32: Result := 5;
+    TDPMPlatform.AndroidIntel64: Result := 5;
+    TDPMPlatform.iOS32: Result := 0;
+    TDPMPlatform.iOS64: Result := 0;
+    TDPMPlatform.LinuxIntel32: Result := 4;
+    TDPMPlatform.LinuxIntel64: Result := 4;
+    TDPMPlatform.LinuxArm32: Result := 4;
+    TDPMPlatform.LinuxArm64: Result := 4;
+  else
+    Result := -1;
+  end;
+end;
+
+procedure TDSpecCreatorForm.tsDryRunResize(Sender: TObject);
+var
+  WholeWidth : Integer;
+  WholeHeight : Integer;
+begin
+  LockDrawing;
+  try
+    WholeWidth := (tsDryRun.ClientWidth - 80);
+    WholeHeight :=  tsDryRun.ClientHeight - tvDryRunFolders.Top - 50;
+    tvDryRunFolders.Left := 20;
+    tvDryRunFolders.Width := Trunc(WholeWidth * 0.2);
+    tvDryRunFolders.Height := WholeHeight;
+    lvDryRunFiles.Left := tvDryRunFolders.Left + tvDryRunFolders.Width + 20;
+    lvDryRunFiles.Width := Trunc(WholeWidth * 0.5);
+    lvDryRunFiles.Height := WholeHeight;
+    lvTemplatePlatformList.Left := 20 + lvDryRunFiles.Left + lvDryRunFiles.Width;
+    lvTemplatePlatformList.Width := Trunc(WholeWidth * 0.3);
+    lvTemplatePlatformList.Height := WholeHeight;
+  finally
+    UnLockDrawing;
+  end;
+end;
+
+
+procedure TDSpecCreatorForm.tsDryRunShow(Sender: TObject);
+var
+  i : Integer;
+  j : Integer;
+  lvItem : TTargetPlatformListItem;
+begin
+  lvTemplatePlatformList.Clear;
+  for i := 0 to FOpenFile.spec.TargetPlatforms.Count - 1 do
+  begin
+    for j := 0 to High(FOpenFile.spec.TargetPlatforms[i].Platforms) do
+    begin
+      lvItem := lvTemplatePlatformList.Items.Add as TTargetPlatformListItem;
+      lvItem.Caption := CompilerToString(FOpenFile.spec.TargetPlatforms[i].Compiler) + ' - ' + DPMPlatformToString(FOpenFile.spec.TargetPlatforms[i].Platforms[j]);
+      lvItem.SubItems.Add(FOpenFile.spec.TargetPlatforms[i].TemplateName);
+      lvItem.targetPlatform := FOpenFile.spec.TargetPlatforms[i];
+      lvItem.platform := FOpenFile.spec.TargetPlatforms[i].Platforms[j];
+      lvItem.ImageIndex := PlatformToIconIndex(lvItem.platform);
+    end;
+  end;
 end;
 
 procedure TDSpecCreatorForm.tvTemplatesChange(Sender: TObject; Node: TTreeNode);
