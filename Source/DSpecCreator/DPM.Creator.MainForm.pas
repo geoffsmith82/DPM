@@ -1638,6 +1638,12 @@ end;
 
 procedure TDSpecCreatorForm.edtIdChange(Sender: TObject);
 begin
+  if not TPackageIdValidator.IsValidPackageId(edtId.Text) then
+  begin
+    edtId.Color := clYellow;
+  end
+  else
+    edtId.Color := clWhite;
   FOpenFile.spec.metadata.id := edtId.Text;
 end;
 
