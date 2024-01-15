@@ -1760,9 +1760,22 @@ begin
 end;
 
 procedure TDSpecCreatorForm.edtVersionChange(Sender: TObject);
+var
+  version : TPackageVersion;
 begin
   if length(edtVersion.Text) > 0 then
-    FOpenFile.spec.metadata.version := TPackageVersion.Parse(edtVersion.Text);
+  begin
+    if TPackageVersion.TryParse(edtVersion.Text, version) then
+    begin
+      edtVersion.Color := clWhite;
+      FOpenFile.spec.metadata.version := version;//TPackageVersion.TryParse(edtVersion.Text);
+    end
+    else
+    begin
+      edtVersion.Color := clYellow;
+      FOpenFile.spec.metadata.version := TPackageVersion.Empty;
+    end;
+  end;
 end;
 
 procedure TDSpecCreatorForm.FormCreate(Sender: TObject);
