@@ -396,14 +396,30 @@ begin
       json.S['icon'] := FIcon;
     json.S['authors'] := FAuthors;
     json.S['projectUrl'] := FProjectUrl;
+    if length(FRepositoryType) > 0 then
+      json.S['repositoryType'] := FRepositoryType;
     json.S['repositoryUrl'] := FRepositoryUrl;
+    if Length(FRepositoryBranch) > 0 then
+      json.S['repositoryBranch'] := FRepositoryBranch;
+    if Length(FRepositoryCommit) > 0 then
+      json.S['repositoryCommit'] := FRepositoryCommit;
+    if Length(FReleaseNotes) > 0 then
+      json.S['releaseNotes'] := FReleaseNotes;
+
+
     json.S['license'] := FLicense;
+    json.S['licenseType'] := LicenseTypeTypeToString(FLicenseType);
     json.S['copyright'] := FCopyright;
     json.S['tags'] := FTags;
     if FIsTrial then
       json.B['istrial'] := FIsTrial;
     if FIsCommercial then
       json.b['iscommercial'] := FIsCommercial;
+    if Length(FReadme) > 0 then
+      json.S['readme'] := FReadme;
+
+    if FUIFrameworkType <> TDPMUIFrameworkType.None then
+      json.S['uiFramework'] := UIFrameworkTypeToString(FUIFrameworkType);
 
     Result := json.ToJSON;
   finally
