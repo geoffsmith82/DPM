@@ -36,6 +36,7 @@ uses
   VSoft.CancellationToken,
   DPM.Core.Options.Pack,
   DPM.Core.Types,
+  DPM.Core.Spec.Interfaces,
   DPM.Core.TargetPlatform,
   DPM.Core.Packaging.Archive;
 
@@ -44,6 +45,11 @@ type
   IPackageWriter = interface
   ['{10944B58-5766-4B73-9C7F-C8488151E42B}']
     function WritePackageFromSpec(const cancellationToken : ICancellationToken; const options : TPackOptions) : boolean;
+  end;
+
+  IDryRunPackageWriter = interface
+  ['{8CE96077-308A-4EEB-9CB2-9E71BCFAA75C}']
+    function WritePackage(const outputFolder : string; const targetPlatform : ISpecTargetPlatform; const spec : IPackageSpec; const version : TPackageVersion; const basePath : string) : boolean;
   end;
 
 implementation

@@ -42,7 +42,7 @@ uses
   DPM.Core.Packaging.Archive;
 
 type
-  TPackageWriter = class(TInterfacedObject, IPackageWriter)
+  TPackageWriter = class(TInterfacedObject, IPackageWriter, IDryRunPackageWriter)
   private
     FLogger : ILogger;
     FArchiveWriter : IPackageArchiveWriter;

@@ -1024,6 +1024,17 @@ object DSpecCreatorForm: TDSpecCreatorForm
       ImageIndex = 5
       OnResize = tsDryRunResize
       OnShow = tsDryRunShow
+      object lblDryRunHelp: TLabel
+        Left = 3
+        Top = 3
+        Width = 813
+        Height = 15
+        Caption = 
+          'Dry Run allows you to see the expected results of the configured' +
+          ' options for the package for a compiler/platform, before actuall' +
+          'y generating the .dpkg file.'
+        Enabled = False
+      end
       object tvDryRunFolders: TTreeView
         Left = 3
         Top = 48

@@ -32,6 +32,7 @@ uses
   System.RegularExpressions,
   Spring.Collections,
   DosCommand,
+  VSoft.CancellationToken,
   DPM.Core.Types,
   DPM.Core.Logging,
   DPM.Core.Spec.Interfaces,
@@ -210,6 +211,7 @@ type
     N2: TMenuItem;
     About1: TMenuItem;
     PlatformImageList: TImageList;
+    lblDryRunHelp: TLabel;
     procedure FormDestroy(Sender: TObject);
     procedure btnAddExcludeClick(Sender: TObject);
     procedure btnAddTemplateClick(Sender: TObject);
@@ -372,6 +374,12 @@ uses
   SVG,
   DPM.Core.Dependency.Version,
   DPM.Core.Packaging.IdValidator,
+  DPM.Core.Packaging,
+  DPM.Core.Packaging.Writer,
+  DPM.Core.Packaging.Archive,
+  DPM.Creator.Packaging.Archiver,
+  DPM.Core.Spec.Reader,
+  DPM.Core.Options.Pack,
   DPM.Creator.TemplateForm,
   DPM.Creator.FileForm,
   DPM.Creator.BuildForm,
@@ -476,7 +484,7 @@ begin
   selectedNode := tvTemplates.Selected as TTemplateTreeNode;
   if selectedNode <> nil then
   begin
-    selectedNode.DeleteEntry;;
+    selectedNode.DeleteEntry;
     parentNode := selectedNode.Parent as TTemplateTreeNode;
     tvTemplates.Items.Delete(selectedNode);
     tvTemplates.Selected := parentNode;
@@ -1970,7 +1978,6 @@ begin
       result := node;
     node := node.getNextSibling as TTemplateTreeNode;
   end;
-
 end;
 
 function TDSpecCreatorForm.FindTemplateNode(const template: ISpecTemplate): TTemplateTreeNode;
@@ -1985,8 +1992,6 @@ begin
       result := node;
     node := node.getNextSibling as TTemplateTreeNode;
   end;
-
-
 end;
 
 procedure TDSpecCreatorForm.FormCloseQuery(Sender: TObject; var CanClose: Boolean);
@@ -2053,9 +2058,27 @@ procedure TDSpecCreatorForm.lvTemplatePlatformListSelectItem(Sender: TObject;
 var
   targetPlatformItem : TTargetPlatformListItem;
   targetPlatform : ISpecTargetPlatform;
+  packageWriter : IDryRunPackageWriter;
+  packageArchiveWriter : IPackageArchiveWriter;
+  packageSpecReader : IPackageSpecReader;
+  cancelToken : ICancellationToken;
+  FCancellationTokenSource : ICancellationTokenSource;
+  outputPath : string;
+  basePath : string;
 begin
+  FCancellationTokenSource := TCancellationTokenSourceFactory.Create;
+  cancelToken := FCancellationTokenSource.Token;
   targetPlatformItem := Item as TTargetPlatformListItem;
   targetPlatform := targetPlatformItem.targetPlatform.CloneForPlatform(targetPlatformItem.platform);
+
+  packageArchiveWriter := TDryRunPackageArchiveWriter.Create;
+  packageSpecReader := TPackageSpecReader.Create(FLogger);
+
+  packageWriter := TPackageWriter.Create(FLogger, packageArchiveWriter, packageSpecReader);
+
+  outputPath := 'D:\Programming\components\d7zip\';
+  basePath := FOpenFile.WorkingDir;
+  packageWriter.WritePackage(outputPath, targetPlatform, FOpenFile.spec, FOpenFile.spec.MetaData.Version, basePath);
 end;
 
 procedure TDSpecCreatorForm.miNewClick(Sender: TObject);
@@ -2178,6 +2201,7 @@ var
   j : Integer;
   lvItem : TTargetPlatformListItem;
 begin
+  tsDryRunResize(Sender);
   lvTemplatePlatformList.Clear;
   for i := 0 to FOpenFile.spec.TargetPlatforms.Count - 1 do
   begin
