@@ -33,6 +33,7 @@ uses
   Spring.Collections,
   DosCommand,
   VSoft.CancellationToken,
+  DPM.Core.Spec,
   DPM.Core.Types,
   DPM.Core.Logging,
   DPM.Core.Spec.Interfaces,
@@ -380,6 +381,7 @@ uses
   DPM.Creator.Packaging.Archiver,
   DPM.Core.Spec.Reader,
   DPM.Core.Options.Pack,
+  DPM.Core.Spec.TargetPlatform,
   DPM.Creator.TemplateForm,
   DPM.Creator.FileForm,
   DPM.Creator.BuildForm,
@@ -2065,20 +2067,62 @@ var
   FCancellationTokenSource : ICancellationTokenSource;
   outputPath : string;
   basePath : string;
+  i : Integer;
+  lvItem : TListItem;
+  spec : IPackageSpec;
+  specReader : IPackageSpecReader;
+  selectedCompiler : TCompilerVersion;
+  selectedPlatform : TDPMPlatform;
+  properties : TStringList;
 begin
   FCancellationTokenSource := TCancellationTokenSourceFactory.Create;
   cancelToken := FCancellationTokenSource.Token;
   targetPlatformItem := Item as TTargetPlatformListItem;
-  targetPlatform := targetPlatformItem.targetPlatform.CloneForPlatform(targetPlatformItem.platform);
+  selectedCompiler := targetPlatformItem.targetPlatform.Compiler;
+  selectedPlatform := targetPlatformItem.platform;
+
+  if (selectedCompiler = TCompilerVersion.UnknownVersion) or
+     (selectedPlatform = TDPMPlatform.UnknownPlatform) then
+  begin
+    Exit;
+  end;
+
+  specReader := TPackageSpecReader.Create(FLogger);
+  spec := specReader.ReadSpecString(FOpenFile.AsString);
+
+  properties := TStringList.Create;
+  try
+    spec.PreProcess(spec.MetaData.Version, properties);
+  finally
+    FreeAndNil(properties);
+  end;
 
   packageArchiveWriter := TDryRunPackageArchiveWriter.Create;
   packageSpecReader := TPackageSpecReader.Create(FLogger);
 
   packageWriter := TPackageWriter.Create(FLogger, packageArchiveWriter, packageSpecReader);
 
+  for I := 0 to spec.TargetPlatforms.Count - 1 do
+  begin
+    if (spec.TargetPlatforms[i].Compiler = selectedCompiler) and
+       (spec.TargetPlatforms[i].Platforms[0] = selectedPlatform) then
+    begin
+      targetPlatform := spec.TargetPlatforms[i];
+      break;
+    end;
+  end;
+
   outputPath := 'D:\Programming\components\d7zip\';
   basePath := FOpenFile.WorkingDir;
-  packageWriter.WritePackage(outputPath, targetPlatform, FOpenFile.spec, FOpenFile.spec.MetaData.Version, basePath);
+
+  packageWriter.WritePackage(outputPath, targetPlatform, spec, spec.MetaData.Version, basePath);
+
+  lvDryRunFiles.Clear;
+  for I := 0 to packageArchiveWriter.Files.Count - 1 do
+  begin
+    lvItem := lvDryRunFiles.Items.Add;
+    lvItem.Caption := packageArchiveWriter.Files[i].archiveFilename + ' | ' + packageArchiveWriter.Files[i].Filename;
+  end;
 end;
 
 procedure TDSpecCreatorForm.miNewClick(Sender: TObject);

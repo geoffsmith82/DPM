@@ -14,6 +14,7 @@ uses
   DPM.Creator.SearchPathForm in 'DPM.Creator.SearchPathForm.pas' {SearchPathForm},
   DPM.Creator.OptionsForm in 'DPM.Creator.OptionsForm.pas' {OptionsForm},
   DPM.Creator.DependencyForm in 'DPM.Creator.DependencyForm.pas' {DependencyForm},
+  DPM.Creator.Packaging.Archiver in 'DPM.Creator.Packaging.Archiver.pas',
   DPM.Core.Types in '..\Core\DPM.Core.Types.pas',
   DPM.Core.TargetPlatform in '..\Core\DPM.Core.TargetPlatform.pas',
   DPM.Core.Init in '..\Core\DPM.Core.Init.pas',

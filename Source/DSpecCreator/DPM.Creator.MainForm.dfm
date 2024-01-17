@@ -1048,8 +1048,13 @@ object DSpecCreatorForm: TDSpecCreatorForm
         Top = 48
         Width = 273
         Height = 426
-        Columns = <>
+        Columns = <
+          item
+            Caption = 'filename'
+            Width = 400
+          end>
         TabOrder = 1
+        ViewStyle = vsReport
       end
       object lvTemplatePlatformList: TListView
         Left = 600

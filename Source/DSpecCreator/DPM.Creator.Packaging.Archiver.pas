@@ -10,16 +10,12 @@ uses
   DPM.Core.Packaging.Archive.Writer;
 
 type
-  TFileItems = class
-    filename: string;
-    archiveFilename: string;
-  end;
-
   TDryRunPackageArchiveWriter = class(TInterfacedObject, IPackageArchiveWriter)
   private
     FIcons : TObjectList<TFileItems>;
     FFiles : TObjectList<TFileItems>;
     FBasePath : string;
+    function GetFiles: TObjectList<TFileItems>;
   public
     procedure SetBasePath(const path : string);
     function WriteMetaDataFile(const stream : TStream) : Boolean;
@@ -119,6 +115,11 @@ end;
 function TDryRunPackageArchiveWriter.GetArchivePath: string;
 begin
 
+end;
+
+function TDryRunPackageArchiveWriter.GetFiles: TObjectList<TFileItems>;
+begin
+  Result := FFiles;
 end;
 
 function TDryRunPackageArchiveWriter.GetLastErrorString: string;

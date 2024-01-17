@@ -31,6 +31,7 @@ interface
 uses
   System.Classes,
   System.Zip,
+  System.Generics.Collections,
   DPM.Core.Types,
   DPM.Core.Logging,
   DPM.Core.Packaging.Archive;
@@ -60,7 +61,7 @@ type
     procedure Close;
     procedure SetBasePath(const path : string);
     function GetPackageVersion : TPackageVersion;
-
+    function GetFiles: TObjectList<TFileItems>;
   public
     constructor Create(const logger : ILogger); overload;
     destructor Destroy; override;
@@ -166,6 +167,11 @@ begin
   //  else
   result := TPath.GetDirectoryName(FFileName);
 
+end;
+
+function TPackageArchiveWriter.GetFiles: TObjectList<TFileItems>;
+begin
+  raise Exception.Create('Not implemented');
 end;
 
 function TPackageArchiveWriter.GetLastErrorString : string;
