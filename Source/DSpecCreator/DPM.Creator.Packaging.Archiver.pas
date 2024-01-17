@@ -14,6 +14,7 @@ type
   private
     FIcons : TObjectList<TFileItems>;
     FFiles : TObjectList<TFileItems>;
+    FSpecContent : string;
     FBasePath : string;
     function GetFiles: TObjectList<TFileItems>;
   public
@@ -143,8 +144,16 @@ begin
 end;
 
 function TDryRunPackageArchiveWriter.WriteMetaDataFile(const stream: TStream): Boolean;
+var
+  strStream : TStringStream;
 begin
-
+  strStream := TStringStream.Create;
+  try
+    strStream.CopyFrom(stream, stream.Size);
+    FSpecContent := strStream.DataString;
+  finally
+    FreeAndNil(strStream);
+  end;
 end;
 
 end.

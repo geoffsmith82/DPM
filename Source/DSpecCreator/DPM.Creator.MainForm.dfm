@@ -1050,9 +1050,15 @@ object DSpecCreatorForm: TDSpecCreatorForm
         Height = 426
         Columns = <
           item
-            Caption = 'filename'
+            Caption = 'Filename'
             Width = 400
+          end
+          item
+            Caption = 'Source'
+            Width = 300
           end>
+        RowSelect = True
+        SortType = stBoth
         TabOrder = 1
         ViewStyle = vsReport
       end
@@ -1159,12 +1165,13 @@ object DSpecCreatorForm: TDSpecCreatorForm
     object tsLogging: TTabSheet
       Caption = 'Logging'
       ImageIndex = 4
-      object Memo2: TMemo
+      object mmoLog: TMemo
         Left = 0
         Top = 0
         Width = 867
         Height = 477
         Align = alClient
+        ScrollBars = ssBoth
         TabOrder = 0
       end
     end

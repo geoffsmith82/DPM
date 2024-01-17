@@ -140,7 +140,7 @@ type
     edtTemplateName: TEdit;
     lblTemplateName: TLabel;
     tsLogging: TTabSheet;
-    Memo2: TMemo;
+    mmoLog: TMemo;
     chkInstall: TCheckBox;
     VariablesList: TValueListEditor;
     ActionList1: TActionList;
@@ -1790,7 +1790,7 @@ end;
 
 procedure TDSpecCreatorForm.FormCreate(Sender: TObject);
 begin
-  FLogger := TDSpecLogger.Create(Memo2.Lines);
+  FLogger := TDSpecLogger.Create(mmoLog.Lines);
   FOpenFile := TDSpecFile.Create(FLogger);
   FDosCommand := TDosCommand.Create(nil);
   FDosCommand.OnNewLine := DosCommandNewLine;
@@ -2075,6 +2075,11 @@ var
   selectedPlatform : TDPMPlatform;
   properties : TStringList;
 begin
+  if not Selected  then
+  begin
+    lvDryRunFiles.Clear;
+    Exit;
+  end;
   FCancellationTokenSource := TCancellationTokenSourceFactory.Create;
   cancelToken := FCancellationTokenSource.Token;
   targetPlatformItem := Item as TTargetPlatformListItem;
@@ -2117,11 +2122,17 @@ begin
 
   packageWriter.WritePackage(outputPath, targetPlatform, spec, spec.MetaData.Version, basePath);
 
-  lvDryRunFiles.Clear;
-  for I := 0 to packageArchiveWriter.Files.Count - 1 do
-  begin
-    lvItem := lvDryRunFiles.Items.Add;
-    lvItem.Caption := packageArchiveWriter.Files[i].archiveFilename + ' | ' + packageArchiveWriter.Files[i].Filename;
+  lvDryRunFiles.LockDrawing;
+  try
+    lvDryRunFiles.Clear;
+    for I := 0 to packageArchiveWriter.Files.Count - 1 do
+    begin
+      lvItem := lvDryRunFiles.Items.Add;
+      lvItem.Caption := packageArchiveWriter.Files[i].archiveFilename;
+      lvItem.SubItems.Add(packageArchiveWriter.Files[i].Filename);
+    end;
+  finally
+    lvDryRunFiles.UnlockDrawing;
   end;
 end;
 
@@ -2131,6 +2142,8 @@ begin
   FOpenFile := TDSpecFile.Create(FLogger);
   FSavefilename := '';
   Caption := 'Untitled - dspec Creator';
+  lvTemplatePlatformList.Clear;
+  lvDryRunFiles.Clear;
   LoadDspecStructure;
 end;
 
@@ -2141,9 +2154,11 @@ begin
   if OpenDialog.Execute then
   begin
     dspecFilename := OpenDialog.FileName;
-    FOpenFile.LoadFromFile( dspecFilename);
+    FOpenFile.LoadFromFile(dspecFilename);
     FSavefilename := dspecFilename;
     Caption := dspecFilename + ' - ' + cToolName;
+    lvTemplatePlatformList.Clear;
+    lvDryRunFiles.Clear;
     LoadDspecStructure;
   end;
 end;
@@ -2247,6 +2262,7 @@ var
 begin
   tsDryRunResize(Sender);
   lvTemplatePlatformList.Clear;
+  lvDryRunFiles.Clear;
   for i := 0 to FOpenFile.spec.TargetPlatforms.Count - 1 do
   begin
     for j := 0 to High(FOpenFile.spec.TargetPlatforms[i].Platforms) do
