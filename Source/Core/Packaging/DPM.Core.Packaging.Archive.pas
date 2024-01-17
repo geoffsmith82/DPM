@@ -71,6 +71,7 @@ type
   IPackageArchiveWriter = interface(IPackageArchive)
     ['{B1BA4ED1-E456-42DE-AA17-AA53480EE645}']
     function GetFiles: TObjectList<TFileItems>;
+    function GetIconFiles: TObjectList<TFileItems>;
     procedure SetBasePath(const path : string);
     function WriteMetaDataFile(const stream : TStream) : Boolean;
     function AddIcon(const filePath : string) : boolean;
@@ -78,6 +79,8 @@ type
     function AddFile(const fileName : string; const archiveFileName : string) : boolean; overload;
     function AddFiles(const files : System.TArray < System.string > ) : Boolean;
     property Files : TObjectList<TFileItems> read GetFiles;
+    property Icons : TObjectList<TFileItems> read GetIconFiles;
+
   end;
 
 

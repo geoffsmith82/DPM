@@ -50,7 +50,7 @@ begin
 
   if not TPath.IsRelativePath(Fspec.MetaData.Icon) then
   begin
-    relativePath := ExtractRelativePath(ExtractFilePath(filename), filename);
+    relativePath := ExtractRelativePath(ExtractFilePath(filename), Fspec.MetaData.Icon);
     Fspec.MetaData.Icon := relativePath;
   end;
 

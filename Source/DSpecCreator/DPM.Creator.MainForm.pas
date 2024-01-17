@@ -2125,6 +2125,17 @@ begin
   lvDryRunFiles.LockDrawing;
   try
     lvDryRunFiles.Clear;
+    lvItem := lvDryRunFiles.Items.Add;
+    lvItem.Caption := 'package.dspec';
+    lvItem.SubItems.Add('');
+
+
+    for I := 0 to packageArchiveWriter.Icons.Count - 1 do
+    begin
+      lvItem := lvDryRunFiles.Items.Add;
+      lvItem.Caption := packageArchiveWriter.Icons[i].archiveFilename;
+      lvItem.SubItems.Add(packageArchiveWriter.Icons[i].Filename);
+    end;
     for I := 0 to packageArchiveWriter.Files.Count - 1 do
     begin
       lvItem := lvDryRunFiles.Items.Add;

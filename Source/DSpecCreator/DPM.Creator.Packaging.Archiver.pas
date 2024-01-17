@@ -17,6 +17,7 @@ type
     FSpecContent : string;
     FBasePath : string;
     function GetFiles: TObjectList<TFileItems>;
+    function GetIconFiles: TObjectList<TFileItems>;
   public
     procedure SetBasePath(const path : string);
     function WriteMetaDataFile(const stream : TStream) : Boolean;
@@ -72,7 +73,6 @@ begin
     filename.filename := files[i];
     FFiles.Add(filename);
   end;
-
   Result := True;
 end;
 
@@ -82,6 +82,7 @@ var
 begin
   icon := TFileItems.Create;
   icon.filename := filePath;
+  icon.archiveFilename := 'icon' + ExtractFileExt(filePath);
   FIcons.Add(icon);
   Result := True;
 end;
@@ -121,6 +122,11 @@ end;
 function TDryRunPackageArchiveWriter.GetFiles: TObjectList<TFileItems>;
 begin
   Result := FFiles;
+end;
+
+function TDryRunPackageArchiveWriter.GetIconFiles: TObjectList<TFileItems>;
+begin
+  Result := FIcons;
 end;
 
 function TDryRunPackageArchiveWriter.GetLastErrorString: string;

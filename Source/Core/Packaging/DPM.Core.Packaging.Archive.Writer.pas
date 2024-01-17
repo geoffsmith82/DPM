@@ -62,6 +62,7 @@ type
     procedure SetBasePath(const path : string);
     function GetPackageVersion : TPackageVersion;
     function GetFiles: TObjectList<TFileItems>;
+    function GetIconFiles: TObjectList<TFileItems>;
   public
     constructor Create(const logger : ILogger); overload;
     destructor Destroy; override;
@@ -170,6 +171,11 @@ begin
 end;
 
 function TPackageArchiveWriter.GetFiles: TObjectList<TFileItems>;
+begin
+  raise Exception.Create('Not implemented');
+end;
+
+function TPackageArchiveWriter.GetIconFiles: TObjectList<TFileItems>;
 begin
   raise Exception.Create('Not implemented');
 end;
